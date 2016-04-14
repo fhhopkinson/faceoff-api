@@ -25,24 +25,15 @@ var client = s3.createClient({
   },
 });
 
-
 var mongoose = require('mongoose');
-
-mongoose.connect('mongodb://localhost:27017/faceoff2');
-
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/faceoff2');
 app.use(cors());
 app.use(express.static('public'));
-
-
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 var routes = require('./config/routes');
-
-
-
-
 var storage =   multer.diskStorage({
   destination: function (req, file, callback) {
     callback(null, '../frontend/public/uploads/');
@@ -51,8 +42,6 @@ var storage =   multer.diskStorage({
     callback(null, file.fieldname + '-' + Date.now());
   }
 });
-
-
 var upload = multer({ storage: storage })
 
 
@@ -97,30 +86,11 @@ console.log(req.file);
 	   res.status(200).json({ filename: req.file.filename + '-cropped.jpg' });
 
 	 });
-/*  var params = {
-     Bucket: 'faceoffhackathon',
-     Key: req.file.destination + req.file.filename + '-cropped.jpg',
-     Body: "Nothing needed here"
-   };
-
-   s3.putObject(params, function (perr, pres) {
-     if (perr) {
-       console.log("Error uploading data: ", perr);
-     } else {
-       console.log("Successfully uploaded data to myBucket/myKey");
-
-       res.status(200).json({ filename: "hello world" });
-     }
-   });
-});*/
 
 	}); // end of image magic callback
 
 });
 
-
-
-
 app.use(routes);
 
-app.listen(3000);
+app.listen(process.env.PORT || 3000);
